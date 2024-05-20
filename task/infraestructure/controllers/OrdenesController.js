@@ -17,15 +17,23 @@ class OrdenesController {
     createOrden(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const orden = yield this.ordenesService.createOrden(req.body);
+                const ordenData = req.body;
+                const details = ordenData.details.map((d) => {
+                    return {
+                        productId: d.productId,
+                        price: d.price,
+                        quantity: d.quantity
+                    };
+                });
+                const orden = yield this.ordenesService.createOrden(ordenData, details);
                 res.status(201).json(orden);
             }
             catch (err) {
                 if (err instanceof Error) {
-                    res.status(400).json({ error: err.message });
+                    res.status(400).json({ message: err.message });
                 }
                 else {
-                    res.status(500).json({ error: "Internal server error" });
+                    res.status(500).json({ message: "Unknown error" });
                 }
             }
         });

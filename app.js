@@ -11,7 +11,7 @@ const OrdenesController_1 = require("./task/infraestructure/controllers/OrdenesC
 const PostgresOrdenesRepository_1 = require("./task/infraestructure/repositories/PostgresOrdenesRepository");
 const OrderService_1 = require("./task/application/services/user-cases/OrderService");
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 app.use(body_parser_1.default.json());
 const ordenesRepository = new PostgresOrdenesRepository_1.PostgresOrdenesRepository();
 const ordenesService = new OrderService_1.OrdenesService(ordenesRepository);

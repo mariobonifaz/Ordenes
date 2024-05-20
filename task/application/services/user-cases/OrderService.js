@@ -14,10 +14,10 @@ class OrdenesService {
     constructor(ordenesRepository) {
         this.ordenesRepository = ordenesRepository;
     }
-    createOrden(orden) {
+    createOrden(orden, details) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield this.ordenesRepository.createOrden(orden);
+                return yield this.ordenesRepository.createOrden(orden, details);
             }
             catch (error) {
                 throw new Error(`Error creating order: ${error.message}`);

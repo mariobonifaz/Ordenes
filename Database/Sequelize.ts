@@ -7,6 +7,12 @@ export const sequelize = new Sequelize('servicioOrder', 'postgres', 'POSTGRES', 
     dialectOptions: {}
 });
 
+import Order from "../task/domain/entities/OrderModel";
+import OrderDetail from "../task/domain/entities/OrderDetailsModel";
+
+Order.hasMany(OrderDetail, { foreignKey: 'orderId', as: 'details' });
+OrderDetail.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
+
 // Autenticación y sincronización de la base de datos
 sequelize.authenticate()
     .then(() => {

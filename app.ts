@@ -8,7 +8,7 @@ import { PostgresOrdenesRepository } from "./task/infraestructure/repositories/P
 import { OrdenesService } from "./task/application/services/user-cases/OrderService";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 app.use(bodyParser.json());
 

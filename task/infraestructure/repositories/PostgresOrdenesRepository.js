@@ -14,16 +14,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostgresOrdenesRepository = void 0;
 const OrderModel_1 = __importDefault(require("../../domain/entities/OrderModel"));
+const OrderDetailsModel_1 = __importDefault(require("../../domain/entities/OrderDetailsModel"));
 class PostgresOrdenesRepository {
-    createOrden(orden) {
+    createOrden(orden, details) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const newOrden = yield OrderModel_1.default.create({
                     total: orden.total,
                     fecha: orden.fecha,
                     estatus: orden.estatus
+                }, {
+                    include: [{ model: OrderDetailsModel_1.default, as: 'details' }]
                 });
-                return newOrden.toJSON();
+                // Crear cada detalle de orden y asociarlo
+                for (const detail of details) {
+                    yield OrderDetailsModel_1.default.create({
+                        orderId: newOrden.id,
+                        productId: detail.productId,
+                        price: detail.price,
+                        quantity: detail.quantity
+                    });
+                }
+                return newOrden;
             }
             catch (error) {
                 throw new Error(`Error creating order: ${error.message}`);

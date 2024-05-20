@@ -1,18 +1,27 @@
 import { Request, Response } from 'express';
 import { OrdenesService } from '../../application/services/user-cases/OrderService';
+import OrderDetail from '../../domain/entities/OrderDetailsModel';
 
 export class OrdenesController {
     constructor(private ordenesService: OrdenesService) {}
 
     async createOrden(req: Request, res: Response) {
         try {
-            const orden = await this.ordenesService.createOrden(req.body);
+            const ordenData = req.body;
+            const details = ordenData.details.map((d: any) => {
+                return {
+                    productId: d.productId,
+                    price: d.price,
+                    quantity: d.quantity
+                } as OrderDetail;
+            });
+            const orden = await this.ordenesService.createOrden(ordenData, details);
             res.status(201).json(orden);
         } catch (err) {
             if (err instanceof Error) {
-                res.status(400).json({error: err.message})
+                res.status(400).json({ message: err.message });
             } else {
-                res.status(500).json({ error: "Internal server error" });
+                res.status(500).json({ message: "Unknown error" });
             }
         }
     }

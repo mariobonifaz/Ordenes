@@ -1,32 +1,37 @@
-import { Model, DataTypes } from 'sequelize';
-import { sequelize } from '../../../Database/Sequelize'; // Asegúrate de ajustar la ruta según tu estructura de proyecto
+// Order.ts
 
-export class Orden extends Model {
+import { Model, DataTypes, HasManyAddAssociationsMixin, HasManyGetAssociationsMixin } from 'sequelize';
+import { sequelize } from '../../../Database/Sequelize'; // Asegúrate de que la ruta a la configuración de Sequelize sea correcta
+import OrderDetail from './OrderDetailsModel';
+
+export class Order extends Model {
     public id!: number;
     public total!: number;
     public fecha!: Date;
     public estatus!: string;
+
+    // Define la relación aquí
+    public addOrderDetails!: HasManyAddAssociationsMixin<OrderDetail, number>;
+    public getOrderDetails!: HasManyGetAssociationsMixin<OrderDetail>;
 }
 
-Orden.init({
+Order.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
     total: {
-        type: DataTypes.INTEGER, // Ajustar según la precisión necesaria
-        allowNull: false
+        type: DataTypes.FLOAT,
     },
     fecha: {
         type: DataTypes.DATE,
-        allowNull: false
     },
     estatus: {
         type: DataTypes.STRING,
-        allowNull: false
-    },
+    }
 }, {
     sequelize,
-    tableName: 'ordenes' // Nombre de la tabla en la base de datos
+    modelName: 'Order',
+    tableName: 'orders' // Especifica explícitamente el nombre de la tabla
 });

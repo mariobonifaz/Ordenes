@@ -1,7 +1,8 @@
-import { Orden } from "../../domain/entities/Order";
+import { Order } from "../../domain/entities/Order";
+import OrderDetail from "../../domain/entities/OrderDetailsModel";
 
 export interface OrdenesRepository {
-    createOrden(orden: Orden): Promise<Orden>;
-    getAllOrdenes(): Promise<Orden[]>;
-    updateOrderStatus(id: string, estatus: string): Promise<Orden>;
+    createOrden(orden: Order, details: OrderDetail[]): Promise<Order>;
+    getAllOrdenes(): Promise<Order[]>;
+    updateOrderStatus(id: string, estatus: string): Promise<Order>;
 }
