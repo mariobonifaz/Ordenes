@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostgresOrdenesRepository = void 0;
 const OrderModel_1 = __importDefault(require("../../domain/entities/OrderModel"));
 const OrderDetailsModel_1 = __importDefault(require("../../domain/entities/OrderDetailsModel"));
+const axios_1 = __importDefault(require("axios"));
 class PostgresOrdenesRepository {
     createOrden(orden, details) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -56,9 +57,17 @@ class PostgresOrdenesRepository {
     updateOrderStatus(id, estatus) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const order = yield OrderModel_1.default.findByPk(id);
+                const order = yield OrderModel_1.default.findByPk(id, {
+                    include: [{ model: OrderDetailsModel_1.default, as: 'details' }]
+                });
                 if (!order) {
                     throw new Error("Order not found");
+                }
+                // Verificar si el estatus es "enviado"
+                if (estatus === 'enviado' && order.estatus !== 'enviado') {
+                    for (const detail of order.details) { // Usamos la propiedad details
+                        yield this.updateProductStock(detail.productId, detail.quantity);
+                    }
                 }
                 order.estatus = estatus;
                 yield order.save();
@@ -66,6 +75,17 @@ class PostgresOrdenesRepository {
             }
             catch (error) {
                 throw new Error(`Error updating order status: ${error.message}`);
+            }
+        });
+    }
+    updateProductStock(productId, quantity) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const productServiceUrl = 'http://localhost:3001/api/v2/productos/update-stock'; // URL del servicio de productos
+                yield axios_1.default.post(productServiceUrl, { productId, quantity });
+            }
+            catch (error) {
+                console.error('Error updating product stock:', error);
             }
         });
     }

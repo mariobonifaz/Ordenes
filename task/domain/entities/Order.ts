@@ -9,6 +9,7 @@ export class Order extends Model {
     public total!: number;
     public fecha!: Date;
     public estatus!: string;
+    details?: OrderDetail[]; // Añadimos la propiedad details
 
     // Define la relación aquí
     public addOrderDetails!: HasManyAddAssociationsMixin<OrderDetail, number>;

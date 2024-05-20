@@ -2,6 +2,7 @@ import { Order } from "../../domain/entities/Order";
 import { OrdenesRepository } from "../repositories/OrdenesRepositoy";
 import OrdenModel from "../../domain/entities/OrderModel";
 import OrderDetail from "../../domain/entities/OrderDetailsModel";
+import axios from "axios";
 
 export class PostgresOrdenesRepository implements OrdenesRepository {
     async createOrden(orden: Order, details: OrderDetail[]): Promise<Order> {
@@ -41,10 +42,20 @@ export class PostgresOrdenesRepository implements OrdenesRepository {
 
     async updateOrderStatus(id: string, estatus: string): Promise<Order> {
         try {
-            const order = await OrdenModel.findByPk(id);
+            const order = await OrdenModel.findByPk(id, {
+                include: [{ model: OrderDetail, as: 'details' }]
+            });
             if (!order) {
                 throw new Error("Order not found");
             }
+
+            // Verificar si el estatus es "enviado"
+            if (estatus === 'enviado' && order.estatus !== 'enviado') {
+                for (const detail of order.details!) {  // Usamos la propiedad details
+                    await this.updateProductStock(detail.productId, detail.quantity);
+                }
+            }
+
             order.estatus = estatus;
             await order.save();
             return order;
@@ -52,4 +63,14 @@ export class PostgresOrdenesRepository implements OrdenesRepository {
             throw new Error(`Error updating order status: ${(error as Error).message}`);
         }
     }
+
+    private async updateProductStock(productId: number, quantity: number) {
+        try {
+            const productServiceUrl = 'http://localhost:3001/api/v2/productos/update-stock';  // URL del servicio de productos
+            await axios.post(productServiceUrl, { productId, quantity });
+        } catch (error) {
+            console.error('Error updating product stock:', error);
+        }
+    }
+    
 }
